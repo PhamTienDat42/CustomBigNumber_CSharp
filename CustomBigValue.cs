@@ -122,7 +122,7 @@ public class CustomBigValue
 
     public void RoundValue()
     {
-        if(idMultiple <= roundEpsilon)
+        if (idMultiple <= roundEpsilon)
         {
             root = Math.Round(root, idMultiple * 3);
         }
@@ -196,17 +196,17 @@ public class CustomBigValue
 
     public static implicit operator CustomBigValue(int numb)
     {
-        return CustomBigValue.ParseInt(numb);
+        return CustomBigValue.Parse(numb);
     }
 
     public static implicit operator CustomBigValue(long numb)
     {
-        return CustomBigValue.ParseLong(numb);
+        return CustomBigValue.Parse(numb);
     }
 
     public static implicit operator CustomBigValue(float numb)
     {
-        return CustomBigValue.ParseFloat(numb);
+        return CustomBigValue.Parse(numb);
     }
 
     public static implicit operator int(CustomBigValue customBigInt)
@@ -266,7 +266,7 @@ public class CustomBigValue
 
     public override bool Equals(object obj)
     {
-        if(obj is CustomBigValue)
+        if (obj is CustomBigValue)
         {
             return (obj as CustomBigValue) == this;
         }
@@ -291,16 +291,16 @@ public class CustomBigValue
 
     public static bool operator >(CustomBigValue a, CustomBigValue b)
     {
-        if(a.root >= 0 && b.root < 0)
+        if (a.root >= 0 && b.root < 0)
         {
             return true;
         }
-        else if(a.root < 0 && b.root >= 0)
+        else if (a.root < 0 && b.root >= 0)
         {
             return false;
         }
 
-        if(a.root >= 0 && b.root >= 0)
+        if (a.root >= 0 && b.root >= 0)
         {
             if (a.idMultiple > b.idMultiple)
                 return true;
@@ -373,188 +373,60 @@ public class CustomBigValue
         return CustomBigValue.Create(-a.root, a.idMultiple);
     }
     #endregion
-
-    #region CustomBigInt vs Int
-    public static CustomBigValue ParseInt(int numb)
-    {
-        return CustomBigValue.Create(numb, 0);
-    }
-
-    public static bool operator ==(CustomBigValue a, int b)
-    {
-        return a == CustomBigValue.ParseInt(b);
-    }
-
-    public static bool operator !=(CustomBigValue a, int b)
-    {
-        return a != CustomBigValue.ParseInt(b);
-    }
-
-    public static bool operator >(CustomBigValue a, int b)
-    {
-        return a > CustomBigValue.ParseInt(b);
-    }
-
-    public static bool operator <(CustomBigValue a, int b)
-    {
-        return a < CustomBigValue.ParseInt(b);
-    }
-
-    public static bool operator >=(CustomBigValue a, int b)
-    {
-        return a >= CustomBigValue.ParseInt(b);
-    }
-
-    public static bool operator <=(CustomBigValue a, int b)
-    {
-        return a <= CustomBigValue.ParseInt(b);
-    }
-
-    public static CustomBigValue operator +(CustomBigValue a, int b)
-    {
-        return a + CustomBigValue.ParseInt(b);
-    }
-
-    public static CustomBigValue operator -(CustomBigValue a, int b)
-    {
-        return a - CustomBigValue.ParseInt(b);
-    }
-
-    public static CustomBigValue operator *(CustomBigValue a, int b)
-    {
-        return a * CustomBigValue.ParseInt(b);
-    }
-
-    public static CustomBigValue operator /(CustomBigValue a, int b)
-    {
-        return a / CustomBigValue.ParseInt(b);
-    }
-    #endregion
-    #region CustomBigInt vs Float
-    public static CustomBigValue ParseFloat(float numb)
-    {
-        return CustomBigValue.Create(numb, 0);
-    }
-
-    public static bool operator ==(CustomBigValue a, float b)
-    {
-        return a == CustomBigValue.ParseFloat(b);
-    }
-
-    public static bool operator !=(CustomBigValue a, float b)
-    {
-        return a != CustomBigValue.ParseFloat(b);
-    }
-
-    public static bool operator >(CustomBigValue a, float b)
-    {
-        return a > CustomBigValue.ParseFloat(b);
-    }
-
-    public static bool operator <(CustomBigValue a, float b)
-    {
-        return a < CustomBigValue.ParseFloat(b);
-    }
-
-    public static bool operator >=(CustomBigValue a, float b)
-    {
-        return a >= CustomBigValue.ParseFloat(b);
-    }
-
-    public static bool operator <=(CustomBigValue a, float b)
-    {
-        return a <= CustomBigValue.ParseFloat(b);
-    }
-
-    //public static CustomBigInt operator +(CustomBigInt a, float b)
-    //{
-    //    return a + CustomBigInt.ParseFloat(b);
-    //}
-
-    //public static CustomBigInt operator -(CustomBigInt a, float b)
-    //{
-    //    return a - CustomBigInt.ParseFloat(b);
-    //}
-
-    public static CustomBigValue operator *(CustomBigValue a, float b)
-    {
-        return a * CustomBigValue.ParseFloat(b);
-    }
-
-    public static CustomBigValue operator /(CustomBigValue a, float b)
-    {
-        return a / CustomBigValue.ParseFloat(b);
-    }
-    #endregion
-    #region CustomBigInt vs Long
-    public static CustomBigValue ParseLong(long numb)
-    {
-        return CustomBigValue.Create(numb, 0);
-    }
-    public static bool operator ==(CustomBigValue a, long b)
-    {
-        return a == CustomBigValue.ParseLong(b);
-    }
-
-    public static bool operator !=(CustomBigValue a, long b)
-    {
-        return a != CustomBigValue.ParseLong(b);
-    }
-
-    public static bool operator >(CustomBigValue a, long b)
-    {
-        return a > CustomBigValue.ParseLong(b);
-    }
-
-    public static bool operator <(CustomBigValue a, long b)
-    {
-        return a < CustomBigValue.ParseLong(b);
-    }
-
-    public static bool operator >=(CustomBigValue a, long b)
-    {
-        return a >= CustomBigValue.ParseLong(b);
-    }
-
-    public static bool operator <=(CustomBigValue a, long b)
-    {
-        return a <= CustomBigValue.ParseLong(b);
-    }
-
-    public static CustomBigValue operator +(CustomBigValue a, long b)
-    {
-        return a + CustomBigValue.ParseLong(b);
-    }
-
-    public static CustomBigValue operator -(CustomBigValue a, long b)
-    {
-        return a - CustomBigValue.ParseLong(b);
-    }
-
-    public static CustomBigValue operator *(CustomBigValue a, long b)
-    {
-        return a * CustomBigValue.ParseLong(b);
-    }
-
-    public static CustomBigValue operator /(CustomBigValue a, long b)
-    {
-        return a / CustomBigValue.ParseLong(b);
-    }
-    #endregion
     #region CustomBigInt vs Double
-    public static CustomBigValue ParseDouble(double numb)
+    public static CustomBigValue Parse(double numb)
     {
         return CustomBigValue.Create(numb, 0);
     }
 
-    public static CustomBigValue operator*(CustomBigValue a, double b)
+    public static CustomBigValue operator *(CustomBigValue a, double b)
     {
-        return CustomBigValue.Create(a.root * ParseDouble(b), a.idMultiple);
+        return CustomBigValue.Create(a.root * Parse(b), a.idMultiple);
     }
 
-    public static CustomBigValue operator/(CustomBigValue a, double b)
+    public static CustomBigValue operator /(CustomBigValue a, double b)
     {
-        return CustomBigValue.Create(a.root / ParseDouble(b), a.idMultiple);
+        return CustomBigValue.Create(a.root / Parse(b), a.idMultiple);
+    }
+
+    public static bool operator ==(CustomBigValue a, double b)
+    {
+        return a == CustomBigValue.Parse(b);
+    }
+
+    public static bool operator !=(CustomBigValue a, double b)
+    {
+        return a != CustomBigValue.Parse(b);
+    }
+
+    public static bool operator >(CustomBigValue a, double b)
+    {
+        return a > CustomBigValue.Parse(b);
+    }
+
+    public static bool operator <(CustomBigValue a, double b)
+    {
+        return a < CustomBigValue.Parse(b);
+    }
+
+    public static bool operator >=(CustomBigValue a, double b)
+    {
+        return a >= CustomBigValue.Parse(b);
+    }
+
+    public static bool operator <=(CustomBigValue a, double b)
+    {
+        return a <= CustomBigValue.Parse(b);
+    }
+
+    public static CustomBigValue operator +(CustomBigValue a, double b)
+    {
+        return a + CustomBigValue.Parse(b);
+    }
+
+    public static CustomBigValue operator -(CustomBigValue a, double b)
+    {
+        return a - CustomBigValue.Parse(b);
     }
     #endregion
 }
