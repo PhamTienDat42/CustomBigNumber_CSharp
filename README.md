@@ -1,6 +1,6 @@
 !!! Use for Unity project.
 !!! If you want to use in C# you need to change Debug.Log to Console.Log or something else available on your language and enviroment of project.
-CustomBigValue - Managing Large Numbers in C# for Idle & Clicker Games
+CustomBigNumber - Managing Large Numbers in C# for Idle & Clicker Games
 📌 CustomBigValue is a C# library designed for handling extremely large numbers in games, particularly useful for Idle, Clicker, RPG, and financial simulation games. It supports arithmetic operations with exponent notation (E notation), optimizing performance when dealing with massive numbers.
 
 ✨ Key Features
