@@ -44,7 +44,7 @@ public static class CustomBigValueHelper
         return returnValue;
     }
 
-    public static int ToIn32(this CustomBigValue bigInt)
+    public static int ToInt32(this CustomBigValue bigInt)
     {
         if (bigInt < int.MinValue || bigInt > int.MaxValue)
         {
@@ -56,7 +56,7 @@ public static class CustomBigValueHelper
         return (int)temp.Root;
     }
 
-    public static long ToIn64(this CustomBigValue bigInt)
+    public static long ToInt64(this CustomBigValue bigInt)
     {
         if (bigInt < long.MinValue || bigInt > long.MaxValue)
         {
@@ -278,7 +278,7 @@ public class CustomBigValue
         return base.GetHashCode();
     }
 
-    #region CustomBigInt vs CustomBigInt
+    #region CustomBigValue vs CustomBigValue
     public static bool operator !=(CustomBigValue a, CustomBigValue b)
     {
         return a.idMultiple != b.idMultiple || Math.Abs(a.root - b.root) > epsilon;
