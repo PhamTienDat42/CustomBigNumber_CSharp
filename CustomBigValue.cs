@@ -152,8 +152,21 @@ public class CustomBigValue
         {
             var val = value.Split("E");
             this.root = double.Parse(val[0]);
-            this.idMultiple = int.Parse(val[2]);
+            this.idMultiple = int.Parse(val[1]);
+            return;
         }
+
+        value = value.Substring(0, Math.Min(308, value.Length));
+
+        if (double.TryParse(value, out this.root))
+        {
+            this.idMultiple = 0;
+            Normalize();
+            return;
+        }
+
+        this.root = 0;
+        this.idMultiple = 0;
         Debug.LogError($"Undefine Input {value}");
     }
 
