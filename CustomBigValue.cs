@@ -31,56 +31,6 @@ public enum EBigIntPower
     Z = 26,
 }
 
-public static class CustomBigValueHelper
-{
-    public static CustomBigValue Pow(this CustomBigValue bigInt, int power)
-    {
-        CustomBigValue returnValue = new CustomBigValue(bigInt);
-        while (power > 0)
-        {
-            returnValue *= bigInt;
-            power--;
-        }
-        return returnValue;
-    }
-
-    public static int ToInt32(this CustomBigValue bigInt)
-    {
-        if (bigInt < int.MinValue || bigInt > int.MaxValue)
-        {
-            Debug.LogError("Over Flow");
-            return 0;
-        }
-        var temp = new CustomBigValue(bigInt);
-        temp.NormalizeTo(0);
-        return (int)temp.Root;
-    }
-
-    public static long ToInt64(this CustomBigValue bigInt)
-    {
-        if (bigInt < long.MinValue || bigInt > long.MaxValue)
-        {
-            Debug.LogError("Over Flow");
-            return 0;
-        }
-        var temp = new CustomBigValue(bigInt);
-        temp.NormalizeTo(0);
-        return (long)temp.Root;
-    }
-
-    public static float ToFloat(this CustomBigValue bigInt)
-    {
-        if (bigInt < float.MinValue || bigInt > float.MaxValue)
-        {
-            Debug.LogError("Over Flow");
-            return 0;
-        }
-        var temp = new CustomBigValue(bigInt);
-        temp.NormalizeTo(0);
-        return (float)temp.Root;
-    }
-}
-
 public class CustomBigValue
 {
     public double root;
@@ -91,23 +41,19 @@ public class CustomBigValue
     private const int maxEnumValue = 26;
     private const int roundEpsilon = 4;
 
-    public double Root { get => root; set => root = value; }
-    public int IdMultiple { get => idMultiple; set => idMultiple = value; }
-
     public override string ToString()
     {
         return $"{root}E{idMultiple}";
     }
 
-    public string ToVisualString()
+    public string ToVisualString(int decimalAmount = 2)
     {
         if (idMultiple == 0)
         {
-            double value = Math.Round(root, 2);
+            double value = Math.Round(root, decimalAmount);
             return value.ToString();
         }
-
-        string suffix = "";
+        string suffix = string.Empty;
         int remainingPower = idMultiple;
         while (remainingPower >= maxEnumValue)
         {
@@ -115,9 +61,13 @@ public class CustomBigValue
             remainingPower -= maxEnumValue;
         }
         suffix = suffix + ((EBigIntPower)remainingPower).ToString();
-        double roundedRoot = Math.Round(root, 2);
-
-        return $"{roundedRoot.ToString("0.##")}{suffix}";
+        double roundedRoot = Math.Round(root, decimalAmount);
+        string stringDecimal = string.Empty;
+        for (int i = 0; i < decimalAmount; i++)
+        {
+            stringDecimal += '#';
+        }
+        return $"{roundedRoot.ToString($"0.{stringDecimal}")}{suffix}";
     }
 
     public void RoundValue()
@@ -153,40 +103,36 @@ public class CustomBigValue
             var val = value.Split("E");
             this.root = double.Parse(val[0]);
             this.idMultiple = int.Parse(val[1]);
-            return;
         }
-
-        value = value.Substring(0, Math.Min(308, value.Length));
-
-        if (double.TryParse(value, out this.root))
+        else if (double.TryParse(value, out double result))
         {
-            this.idMultiple = 0;
+            this.root = result;
             Normalize();
-            return;
         }
-
-        this.root = 0;
-        this.idMultiple = 0;
-        Debug.LogError($"Undefine Input {value}");
+        else
+            Debug.LogError($"Undefine Input {value}");
     }
 
     public void Normalize()
     {
-        double sign = Math.Sign(root);
-        root = Math.Abs(root);
-
-        while (root >= tenCubed)
+        if (root != 0)
         {
-            root /= tenCubed;
-            idMultiple++;
-        }
-        while (root < 1 && idMultiple > 0)
-        {
-            root *= tenCubed;
-            idMultiple--;
-        }
+            double sign = Math.Sign(root);
+            root = Math.Abs(root);
 
-        root *= sign;
+            while (root >= tenCubed)
+            {
+                root /= tenCubed;
+                idMultiple++;
+            }
+            while (root < 1)
+            {
+                root *= tenCubed;
+                idMultiple--;
+            }
+
+            root *= sign;
+        }
     }
 
     public void NormalizeTo(int _idMultiple)
@@ -207,57 +153,22 @@ public class CustomBigValue
         }
     }
 
-    public static implicit operator CustomBigValue(int numb)
+    public static implicit operator CustomBigValue(double numb)
     {
-        return CustomBigValue.Parse(numb);
+        return new CustomBigValue(numb, 0);
     }
-
-    public static implicit operator CustomBigValue(long numb)
-    {
-        return CustomBigValue.Parse(numb);
-    }
-
-    public static implicit operator CustomBigValue(float numb)
-    {
-        return CustomBigValue.Parse(numb);
-    }
-
     public static implicit operator int(CustomBigValue customBigInt)
     {
-        if (customBigInt < int.MinValue || customBigInt > int.MaxValue)
-        {
-            Debug.LogError("Over Flow");
-            return 0;
-        }
-        var temp = new CustomBigValue(customBigInt);
-        temp.NormalizeTo(0);
-        return (int)(temp.root);
+        return (int)((double)customBigInt);
     }
-
     public static implicit operator long(CustomBigValue customBigInt)
     {
-        if (customBigInt < long.MinValue || customBigInt > long.MaxValue)
-        {
-            Debug.LogError("Over Flow");
-            return 0;
-        }
-        var temp = new CustomBigValue(customBigInt);
-        temp.NormalizeTo(0);
-        return (long)(temp.root);
+        return (long)((double)customBigInt);
     }
-
     public static implicit operator float(CustomBigValue customBigInt)
     {
-        if (customBigInt < float.MinValue || customBigInt > float.MaxValue)
-        {
-            Debug.LogError("Over Flow");
-            return 0;
-        }
-        var temp = new CustomBigValue(customBigInt);
-        temp.NormalizeTo(0);
-        return (float)(temp.root);
+        return (float)((double)customBigInt);
     }
-
     public static implicit operator double(CustomBigValue customBigInt)
     {
         if (customBigInt < double.MinValue || customBigInt > double.MaxValue)
@@ -265,18 +176,8 @@ public class CustomBigValue
             Debug.LogError("Over Flow");
             return 0;
         }
-        var temp = new CustomBigValue(customBigInt);
-        temp.NormalizeTo(0);
-        return temp.root;
+        return customBigInt.root * Math.Pow(tenCubed, customBigInt.idMultiple);
     }
-
-    public static CustomBigValue Create(double root, int idMultiple = 0)
-    {
-        CustomBigValue cBi = new(root, idMultiple);
-        cBi.Normalize();
-        return cBi;
-    }
-
     public override bool Equals(object obj)
     {
         if (obj is CustomBigValue)
@@ -291,14 +192,30 @@ public class CustomBigValue
         return base.GetHashCode();
     }
 
-    #region CustomBigValue vs CustomBigValue
+    #region CustomBigInt vs CustomBigInt
     public static bool operator !=(CustomBigValue a, CustomBigValue b)
     {
+        if (ReferenceEquals(a, null))
+        {
+            return !ReferenceEquals(b, null);
+        }
+        if (ReferenceEquals(b, null))
+        {
+            return true;
+        }
         return a.idMultiple != b.idMultiple || Math.Abs(a.root - b.root) > epsilon;
     }
 
     public static bool operator ==(CustomBigValue a, CustomBigValue b)
     {
+        if (ReferenceEquals(a, null))
+        {
+            return ReferenceEquals(b, null);
+        }
+        if (ReferenceEquals(b, null))
+        {
+            return false;
+        }
         return a.idMultiple == b.idMultiple && Math.Abs(a.root - b.root) < epsilon;
     }
 
@@ -335,14 +252,14 @@ public class CustomBigValue
         }
     }
 
-    public static bool operator <(CustomBigValue a, CustomBigValue b)
-    {
-        return !(a >= b);
-    }
-
     public static bool operator >=(CustomBigValue a, CustomBigValue b)
     {
         return a > b || a == b;
+    }
+
+    public static bool operator <(CustomBigValue a, CustomBigValue b)
+    {
+        return !(a >= b);
     }
 
     public static bool operator <=(CustomBigValue a, CustomBigValue b)
@@ -355,91 +272,70 @@ public class CustomBigValue
         // ignore case div by bigger number
         // ignore case div by number < 1
         // ignore case div by 0
-        if (b.root <= 0)
+        if (b == 0)
             throw new DivideByZeroException("Can't devide by zero");
-        double newRoot = a.root / b.root;
-        int newIdMultiple = a.idMultiple - b.idMultiple;
-        return CustomBigValue.Create(newRoot, newIdMultiple);
+        CustomBigValue _a = new CustomBigValue(a);
+        _a.root /= b.root;
+        _a.idMultiple -= b.idMultiple;
+        _a.Normalize();
+        return _a;
     }
 
     public static CustomBigValue operator *(CustomBigValue a, CustomBigValue b)
     {
-        return CustomBigValue.Create(a.root * b.root, a.idMultiple + b.idMultiple);
-    }
-
-    public static CustomBigValue operator -(CustomBigValue a, CustomBigValue b)
-    {
-        CustomBigValue _b = new CustomBigValue(b);
-        _b.NormalizeTo(a.idMultiple);
-        return Create(a.root - _b.root, a.idMultiple);
+        CustomBigValue _a = new CustomBigValue(a);
+        _a.root *= b.root;
+        _a.idMultiple += b.idMultiple;
+        _a.Normalize();
+        return _a;
     }
 
     public static CustomBigValue operator +(CustomBigValue a, CustomBigValue b)
     {
-        CustomBigValue _b = new CustomBigValue(b);
-        _b.NormalizeTo(a.idMultiple);
-        return Create(a.root + _b.root, a.idMultiple);
+        CustomBigValue _a = new CustomBigValue(a);
+        _a.NormalizeTo(b.idMultiple);
+        _a.root += b.root;
+        _a.Normalize();
+        return _a;
+    }
+
+    public static CustomBigValue operator -(CustomBigValue a, CustomBigValue b)
+    {
+        CustomBigValue _a = new CustomBigValue(a);
+        _a.NormalizeTo(b.idMultiple);
+        _a.root -= b.root;
+        _a.Normalize();
+        return _a;
     }
 
     public static CustomBigValue operator -(CustomBigValue a)
     {
-        return CustomBigValue.Create(-a.root, a.idMultiple);
-    }
-    #endregion
-    #region CustomBigInt vs Double
-    public static CustomBigValue Parse(double numb)
-    {
-        return CustomBigValue.Create(numb, 0);
+        return new CustomBigValue(-a.root, a.idMultiple);
     }
 
-    public static CustomBigValue operator *(CustomBigValue a, double b)
+    public static CustomBigValue operator ++(CustomBigValue a)
     {
-        return CustomBigValue.Create(a.root * Parse(b), a.idMultiple);
+        return a + 1;
     }
 
-    public static CustomBigValue operator /(CustomBigValue a, double b)
+    public static CustomBigValue operator --(CustomBigValue a)
     {
-        return CustomBigValue.Create(a.root / Parse(b), a.idMultiple);
+        return a - 1;
     }
 
-    public static bool operator ==(CustomBigValue a, double b)
+    public static CustomBigValue operator %(CustomBigValue a, CustomBigValue b)
     {
-        return a == CustomBigValue.Parse(b);
+        return a - (a / b) * b;
     }
 
-    public static bool operator !=(CustomBigValue a, double b)
+    public static CustomBigValue operator ^(CustomBigValue a, int power)
     {
-        return a != CustomBigValue.Parse(b);
-    }
-
-    public static bool operator >(CustomBigValue a, double b)
-    {
-        return a > CustomBigValue.Parse(b);
-    }
-
-    public static bool operator <(CustomBigValue a, double b)
-    {
-        return a < CustomBigValue.Parse(b);
-    }
-
-    public static bool operator >=(CustomBigValue a, double b)
-    {
-        return a >= CustomBigValue.Parse(b);
-    }
-
-    public static bool operator <=(CustomBigValue a, double b)
-    {
-        return a <= CustomBigValue.Parse(b);
-    }
-
-    public static CustomBigValue operator +(CustomBigValue a, double b)
-    {
-        return a + CustomBigValue.Parse(b);
-    }
-
-    public static CustomBigValue operator -(CustomBigValue a, double b)
-    {
-        return a - CustomBigValue.Parse(b);
+        CustomBigValue _a = new CustomBigValue(a);
+        for (int i = 1; i < power; i++)
+        {
+            _a *= a;
+        }
+        return _a;
     }
     #endregion
 }
