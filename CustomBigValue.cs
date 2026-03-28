@@ -46,29 +46,82 @@ public class CustomBigValue
         return $"{root}E{idMultiple}";
     }
 
+    private static readonly string[] suffixes = new string[]
+    {
+        "", "K", "M", "B", "T",
+        "AA", "AB", "AC", "AD", "AE", "AF",
+        "AG", "AH", "AI", "AJ", "AK", "AL",
+        "AM", "AN", "AO", "AP", "AQ", "AR",
+        "AS", "AT", "AU", "AV", "AW", "AX",
+        "AY", "AZ"
+    };
+
     public string ToVisualString(int decimalAmount = 2)
     {
-        if (idMultiple == 0)
+        if (root == 0)
+            return "0";
+
+        double value = root;
+        int index = idMultiple;
+
+        // format decimal
+        string format = "0." + new string('#', decimalAmount);
+
+        while (true)
         {
-            double value = Math.Round(root, decimalAmount);
-            return value.ToString();
+            double rounded = Math.Round(value, decimalAmount);
+
+            if (rounded >= 1000.0)
+            {
+                value /= 1000.0;
+                index++;
+                continue;
+            }
+
+            value = rounded;
+            break;
         }
-        string suffix = string.Empty;
-        int remainingPower = idMultiple;
-        while (remainingPower >= maxEnumValue)
+
+        string suffix;
+        if (index < suffixes.Length)
         {
-            suffix = EBigIntPower.Z.ToString() + suffix;
-            remainingPower -= maxEnumValue;
+            suffix = suffixes[index];
         }
-        suffix = suffix + ((EBigIntPower)remainingPower).ToString();
-        double roundedRoot = Math.Round(root, decimalAmount);
-        string stringDecimal = string.Empty;
-        for (int i = 0; i < decimalAmount; i++)
+        else
         {
-            stringDecimal += '#';
+            int first = index / suffixes.Length;
+            int second = index % suffixes.Length;
+
+            suffix = suffixes[first] + suffixes[second];
         }
-        return $"{roundedRoot.ToString($"0.{stringDecimal}")}{suffix}";
+
+        return $"{value.ToString(format)}{suffix}";
     }
+
+    // public string ToVisualString(int decimalAmount = 2)
+    // {
+    //     if (idMultiple == 0)
+    //     {
+    //         double value = Math.Round(root, decimalAmount);
+    //         return value.ToString();
+    //     }
+    //     string suffix = string.Empty;
+    //     int remainingPower = idMultiple;
+    //     while (remainingPower >= maxEnumValue)
+    //     {
+    //         suffix = EBigIntPower.Z.ToString() + suffix;
+    //         remainingPower -= maxEnumValue;
+    //     }
+    //     suffix = suffix + ((EBigIntPower)remainingPower).ToString();
+    //     double roundedRoot = Math.Round(root, decimalAmount);
+    //     // string stringDecimal = string.Empty;
+    //     // for (int i = 0; i < decimalAmount; i++)
+    //     // {
+    //     //     stringDecimal += '#';
+    //     // }
+    //     string stringDecimal = new string('#', decimalAmount);
+    //     return $"{roundedRoot.ToString($"0.{stringDecimal}")}{suffix}";
+    // }
 
     public void RoundValue()
     {
@@ -113,25 +166,56 @@ public class CustomBigValue
             Debug.LogError($"Undefine Input {value}");
     }
 
+    // public void Normalize()
+    // {
+    //     // if (root != 0)
+    //     // {
+    //     //     double sign = Math.Sign(root);
+    //     //     root = Math.Abs(root);
+
+    //     //     while (root >= tenCubed)
+    //     //     {
+    //     //         root /= tenCubed;
+    //     //         idMultiple++;
+    //     //     }
+    //     //     while (root < 1)
+    //     //     {
+    //     //         root *= tenCubed;
+    //     //         idMultiple--;
+    //     //     }
+
+    //     //     root *= sign;
+    //     // }
+    // }
+
     public void Normalize()
     {
-        if (root != 0)
+        if (root == 0)
         {
-            double sign = Math.Sign(root);
-            root = Math.Abs(root);
+            idMultiple = 0;
+            return;
+        }
 
-            while (root >= tenCubed)
-            {
-                root /= tenCubed;
-                idMultiple++;
-            }
-            while (root < 1)
-            {
-                root *= tenCubed;
-                idMultiple--;
-            }
+        double sign = Math.Sign(root);
+        root = Math.Abs(root);
 
-            root *= sign;
+        int shift = (int)(Math.Log10(root) / 3);
+
+        root /= Math.Pow(tenCubed, shift);
+        idMultiple += shift;
+
+        root *= sign;
+
+        // fix edge case
+        if (root >= tenCubed)
+        {
+            root /= tenCubed;
+            idMultiple++;
+        }
+        else if (root < 1)
+        {
+            root *= tenCubed;
+            idMultiple--;
         }
     }
 
@@ -169,14 +253,28 @@ public class CustomBigValue
     {
         return (float)((double)customBigInt);
     }
-    public static implicit operator double(CustomBigValue customBigInt)
+    // public static implicit operator double(CustomBigValue customBigInt)
+    // {
+    //     if (customBigInt < double.MinValue || customBigInt > double.MaxValue)
+    //     {
+    //         Debug.LogError("Over Flow");
+    //         return 0;
+    //     }
+    //     return customBigInt.root * Math.Pow(tenCubed, customBigInt.idMultiple);
+    // }
+    public static implicit operator double(CustomBigValue value)
     {
-        if (customBigInt < double.MinValue || customBigInt > double.MaxValue)
-        {
-            Debug.LogError("Over Flow");
+        if (value == null)
             return 0;
+
+        // double max ~ 1e308
+        if (value.idMultiple > 102)
+        {
+            Debug.LogWarning("CustomBigValue overflow converting to double");
+            return double.PositiveInfinity;
         }
-        return customBigInt.root * Math.Pow(tenCubed, customBigInt.idMultiple);
+
+        return value.root * Math.Pow(tenCubed, value.idMultiple);
     }
     public override bool Equals(object obj)
     {
