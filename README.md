@@ -44,6 +44,10 @@ CustomBigValue value1 = new CustomBigValue(1.5, 3); // 1.5E3 (1,500)
 CustomBigValue value2 = new CustomBigValue(2.5, 6); // 2.5E6 (2,500,000)
 CustomBigValue result = value1 * value2; // 3.75E9 (3,750,000,000)
 
+#Update 1
+New method ToVisualString() for game developer.
+When u call this method it's will return string with "K, M, B, T, ...." like 3k7 (3700), 5m3(5300000), 4b6(4600000000),....
+
 Debug.Log(result.ToString()); // "3.75E9"
 🔗 GitHub Repository
 👉 CustomBigValue_CSharp
